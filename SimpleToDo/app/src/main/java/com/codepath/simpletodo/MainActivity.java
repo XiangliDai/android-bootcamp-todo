@@ -23,7 +23,7 @@ import java.util.ArrayList;
 
 public class MainActivity extends Activity {
     ArrayList<String> items;
-    ArrayAdapter<String> itemsAdapter;
+    ToDoAdapter itemsAdapter;
     ListView lvItems;
     private final int REQUEST_CODE = 1;
 
@@ -32,15 +32,22 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         lvItems = (ListView)findViewById(R.id.lvItems);
+        lvItems.setFadingEdgeLength(6);
+        lvItems.setSmoothScrollbarEnabled(true);
+        lvItems.setDivider(getResources().getDrawable(R.color.bright_foreground_material_light));
+        lvItems.setDividerHeight(1);
+
         readFile();
+
         if(items == null)
             items = new ArrayList<>();
-        itemsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
+        itemsAdapter = new ToDoAdapter(this, items);
         lvItems.setAdapter(itemsAdapter);
 
         setupListViewListener();
 
     }
+
 
     private void setupListViewListener(){
         lvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -88,7 +95,8 @@ public class MainActivity extends Activity {
     public void onAddItem(View view) {
         EditText eNewItem = (EditText) findViewById(R.id.etNewItem);
         String itemText = eNewItem.getText().toString();
-        itemsAdapter.add(itemText);
+        items.add(itemText);
+        itemsAdapter.notifyDataSetChanged();
         writeFile();
         eNewItem.setText("");
     }
@@ -97,7 +105,7 @@ public class MainActivity extends Activity {
         File fileDirs = getFilesDir();
        File todoFile = new File(fileDirs, "todo.txt");
         try{
-            items = new ArrayList<>(FileUtils.readLines(todoFile));
+            items = new ArrayList<String>(FileUtils.readLines(todoFile));
         }catch (IOException e){
             e.printStackTrace();
         }
