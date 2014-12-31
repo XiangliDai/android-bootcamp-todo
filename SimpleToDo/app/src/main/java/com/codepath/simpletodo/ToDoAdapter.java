@@ -7,24 +7,26 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.codepath.simpletodo.model.ToDoItem;
+
 import java.util.List;
 
-public class ToDoAdapter extends ArrayAdapter<String>{
+public class ToDoAdapter extends ArrayAdapter<ToDoItem>{
 
-    List<String> todos;
-    public ToDoAdapter(Context context, List<String> todos) {
+    List<ToDoItem> todos;
+    public ToDoAdapter(Context context, List<ToDoItem> todos) {
         super(context, 0, todos);
         this.todos = todos;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        String todoStr = getItem(position);
+        ToDoItem todo = getItem(position);
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.todo_item, parent, false);
         }
         TextView tvTodoItem = (TextView) convertView.findViewById(R.id.tvTodoItem);
-        tvTodoItem.setText(todoStr);
+        tvTodoItem.setText(todo.name);
         return convertView;
     }
 

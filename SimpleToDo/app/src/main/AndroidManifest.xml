@@ -6,7 +6,8 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme"
+        android:name="ToDoApplication">
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >
@@ -20,6 +21,10 @@
             android:name=".EditItemActivity"
             android:label="@string/title_activity_edit_item" >
         </activity>
+        <meta-data android:name="AA_DB_NAME" android:value="simpletodo.db" />
+        <meta-data
+            android:name="AA_MODELS"
+            android:value="com.codepath.simpletodo.model.ToDoItem" />
     </application>
 
 </manifest>

@@ -2,27 +2,20 @@ package com.codepath.simpletodo;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
-import org.apache.commons.io.FileUtils;
+import com.activeandroid.query.Select;
+import com.codepath.simpletodo.model.ToDoItem;
 
-import java.io.File;
-import java.io.IOError;
-import java.io.IOException;
 import java.util.ArrayList;
 
-
 public class MainActivity extends Activity {
-    ArrayList<String> items;
+    ArrayList<ToDoItem> items;
     ToDoAdapter itemsAdapter;
     ListView lvItems;
     private final int REQUEST_CODE = 1;
@@ -37,7 +30,7 @@ public class MainActivity extends Activity {
         lvItems.setDivider(getResources().getDrawable(R.color.bright_foreground_material_light));
         lvItems.setDividerHeight(1);
 
-        readFile();
+        readFromDB();
 
         if(items == null)
             items = new ArrayList<>();
@@ -48,14 +41,21 @@ public class MainActivity extends Activity {
 
     }
 
+    private void readFromDB() {
+        items = new Select()
+                .from(ToDoItem.class)
+                .orderBy("name ASC").execute();
+    }
+
 
     private void setupListViewListener(){
         lvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                ToDoItem todo = items.get(position);
                 items.remove(position);
+                todo.delete();
                 itemsAdapter.notifyDataSetChanged();
-                writeFile();
                 return true;
             }
         });
@@ -68,10 +68,11 @@ public class MainActivity extends Activity {
         });
     }
 
+
     private void launchEditActivity(int position) {
         Intent i = new Intent(this, EditItemActivity.class);
         i.putExtra("index", position);
-        i.putExtra("item_text", items.get(position));
+        i.putExtra("item_text", items.get(position).name);
         startActivityForResult(i, REQUEST_CODE);
 
     }
@@ -81,9 +82,12 @@ public class MainActivity extends Activity {
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
             String itemText = data.getExtras().getString("item_text");
             int index = data.getExtras().getInt("index");
-            items.set(index,itemText);
+            ToDoItem todo = items.get(index);
+            todo.name = itemText;
+            todo.save();
+            items.set(index, todo);
             itemsAdapter.notifyDataSetChanged();
-            writeFile();
+
         }
     }
     @Override
@@ -95,29 +99,11 @@ public class MainActivity extends Activity {
     public void onAddItem(View view) {
         EditText eNewItem = (EditText) findViewById(R.id.etNewItem);
         String itemText = eNewItem.getText().toString();
-        items.add(itemText);
+        ToDoItem todo = new ToDoItem(itemText);
+        todo.save();
+        items.add(todo);
         itemsAdapter.notifyDataSetChanged();
-        writeFile();
         eNewItem.setText("");
     }
 
-    private void readFile(){
-        File fileDirs = getFilesDir();
-       File todoFile = new File(fileDirs, "todo.txt");
-        try{
-            items = new ArrayList<String>(FileUtils.readLines(todoFile));
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-    }
-
-    private void writeFile(){
-        File fileDirs = getFilesDir();
-        File todoFile = new File(fileDirs, "todo.txt");
-        try{
-            FileUtils.writeLines(todoFile, items);
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-    }
 }
