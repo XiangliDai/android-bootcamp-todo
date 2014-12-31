@@ -1,8 +1,8 @@
 package com.codepath.simpletodo;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
@@ -14,7 +14,7 @@ import com.codepath.simpletodo.model.ToDoItem;
 
 import java.util.ArrayList;
 
-public class MainActivity extends Activity {
+public class MainActivity extends ActionBarActivity {
     ArrayList<ToDoItem> items;
     ToDoAdapter itemsAdapter;
     ListView lvItems;
